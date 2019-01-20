@@ -10,9 +10,7 @@ int main() {
     for (std::string line; std::getline(std::cin, line);) {
         input.push_back(line);
     }
-
-    std::cout << "-------------------------- END INPUT --------------------------" << std::endl;
-
+    
     // process
     int twos = 0;
     int threes = 0;
