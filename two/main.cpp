@@ -7,7 +7,7 @@
 std::string produce_id(const std::vector<std::string>& input) {
     std::vector<std::string> compare_with(input);
 
-    int diff_index;
+    int diff_index = -1;
     for (const auto& lhs : input) {
         compare_with.erase(std::find(compare_with.begin(), compare_with.end(), lhs));
         for (const auto& rhs : compare_with) {
@@ -19,7 +19,7 @@ std::string produce_id(const std::vector<std::string>& input) {
                     diff_index = i;
                 }
             }
-            if (diff_characters == 1) {
+            if (diff_characters == 1 && diff_index >= 0) {
                 std::string box_id(lhs);
                 box_id.erase(box_id.begin()+diff_index);
                 return box_id;
