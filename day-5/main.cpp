@@ -21,7 +21,6 @@ int main() {
     // read input
     std::istreambuf_iterator<char> begin(std::cin), end;
     std::string input(begin, end);
-    std::cout << std::endl << input;
 
     // process
     std::string polymer = reduce(input);
