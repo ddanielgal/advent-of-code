@@ -1,8 +1,8 @@
 import create from "zustand";
 import { immer } from "zustand/middleware/immer";
 import * as fs from "fs";
-import LineByLine from "n-readlines";
 import lodash from "lodash";
+import forEachLine from "../modules/reader.js";
 
 type Elf = number[];
 type State = { elves: Elf[] };
@@ -25,15 +25,14 @@ const addSnack = (elfIndex: number, snack: number) => {
 };
 
 const initialize = (file: fs.PathLike) => {
-  const input = new LineByLine(file);
   addElf();
-  for (let line = input.next(); line; line = input.next()) {
-    if (line.toString() === "") {
+  forEachLine(file, (line) => {
+    if (!line) {
       addElf();
-      continue;
+      return;
     }
-    addSnack(get().elves.length - 1, Number(line.toString()));
-  }
+    addSnack(get().elves.length - 1, Number(line));
+  });
 };
 
 const selectSums = (state: State) =>
@@ -51,5 +50,5 @@ const selectSumOfTopThreeSums = (state: State) => {
 
 // main
 
-initialize("public/input.txt");
+initialize("public/1/input.txt");
 console.log(selectSumOfTopThreeSums(useStore.getState()));
