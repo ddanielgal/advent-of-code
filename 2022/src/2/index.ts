@@ -31,6 +31,10 @@ function counterPrediction(letter: string) {
   return { X: Hand.Rock, Y: Hand.Paper, Z: Hand.Scissors }[letter];
 }
 
+function resultPrediction(letter:string) {
+    return { X: Result.Lose, Y: Result.Draw, Z: Result.Win }[letter];
+}
+
 /**
  * @returns {Result} The result of the game from the perspective of the first player.
  */
@@ -41,13 +45,25 @@ function play(a: Hand, b: Hand): Result {
   return (a + 1) % 3 === b ? Result.Lose : Result.Win;
 }
 
-type State = { strategy: [Hand, Hand][] };
+function playInverse(a:Hand,b:Result) {
+    if (b === Result.Draw) {
+        return a;
+    }
+    if (b === Result.Win) {
+        return (a + 1) % 3;
+    }
+    if (b === Result.Lose) {
+        return (a + 2) % 3;
+    }
+}
+
+type State = { strategy: [Hand, Result][] };
 
 const store = create<State>()(immer(() => ({ strategy: [] })));
 
 const set = store.setState;
 
-function addStrategy(a: Hand, b: Hand) {
+function addStrategy(a: Hand, b: Result) {
   set((state) => {
     state.strategy.push([a, b]);
   });
@@ -56,7 +72,7 @@ function addStrategy(a: Hand, b: Hand) {
 function initialize(file: fs.PathLike) {
   forEachLine(file, (line) => {
     const [a, b] = line.split(" ");
-    addStrategy(opponentPrediction(a), counterPrediction(b));
+    addStrategy(opponentPrediction(a), resultPrediction(b));
   });
 }
 
@@ -65,7 +81,7 @@ const selectHumanReadable = (state: State) =>
 
 const selectGameScore = (state: State) =>
   state.strategy.reduce(
-    (acc, [a, b]) => acc + resultScore(play(b, a)) + handScore(b),
+    (acc, [a, b]) => acc + resultScore(b) + handScore(playInverse(a, b)),
     0
   );
 
