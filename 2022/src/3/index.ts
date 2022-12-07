@@ -15,46 +15,43 @@ function getPriority(item: Item) {
 }
 
 type State = {
-  rucksacks: { leftCompartment: Item[]; rightCompartment: Item[] }[];
+  groups: Item[][][];
 };
 
 const useStore = create<State>()(
   immer(() => ({
-    rucksacks: [],
+    groups: [],
   }))
 );
 
 const set = useStore.setState;
+const get = useStore.getState;
 
 function initialize(file: string) {
   forEachLine(file, (line) => {
-    const first = line.slice(0, line.length / 2);
-    const second = line.slice(line.length / 2);
-    set((state) => {
-      state.rucksacks.push({
-        leftCompartment: first.split(""),
-        rightCompartment: second.split(""),
+    if (
+      get().groups.length === 0 ||
+      get().groups[get().groups.length - 1].length === 3
+    ) {
+      set((state) => {
+        state.groups.push([]);
       });
+    }
+    set((state) => {
+      state.groups[state.groups.length - 1].push(line.split(""));
     });
   });
 }
 
-const getCommonItems = (left: Item[], right: Item[]) => {
-  return lodash.intersection(left, right);
-};
-
-const selectSumPrioritiesOfCommonItems = (state: State) => {
-  const sackSums = state.rucksacks.map((sack) => {
-    const commonItems = getCommonItems(
-      sack.leftCompartment,
-      sack.rightCompartment
-    );
-    return commonItems.reduce((acc, item) => acc + getPriority(item), 0);
-  });
-  return sackSums.reduce((acc, sum) => acc + sum, 0);
-};
+const selectSumPrioritiesOfCommonItems = (state: State) =>
+  lodash.sum(
+    state.groups.map((group) => {
+      const commonItems = lodash.intersection(...group);
+      return lodash.sum(commonItems.map(getPriority));
+    })
+  );
 
 export default function main() {
   initialize("public/3/input.txt");
-  console.log(selectSumPrioritiesOfCommonItems(useStore.getState()));
+  console.log(selectSumPrioritiesOfCommonItems(get()));
 }
