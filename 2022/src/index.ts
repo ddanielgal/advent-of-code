@@ -1,3 +1,3 @@
-import main from './3/index.js'
+import main from './4/index.js'
 
 main()
