@@ -40,17 +40,11 @@ function initialize(file: string) {
   });
 }
 
-const isFullyContained = (left: Elf, right: Elf) =>
-  left.every((section) => right.includes(section));
+const hasOverlap = ([first, second]: Pair) =>
+  first.some((section) => second.includes(section));
 
-const hasFullContainment = (pair: Pair) => {
-  const [first, second] = pair;
-  return isFullyContained(first, second) || isFullyContained(second, first);
-};
-
-const selectCountOfPairsWithFullContainment = (state: State) => {
-  return state.pairs.filter(hasFullContainment).length;
-};
+const selectCountOfPairsWithFullContainment = (state: State) =>
+  state.pairs.filter(hasOverlap).length;
 
 export default function main() {
   initialize("public/4/input.txt");
