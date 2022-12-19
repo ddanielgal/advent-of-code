@@ -41,7 +41,11 @@ function moveCrate(from: number, to: number) {
 }
 
 function moveCrates(from: number, to: number, count: number) {
-  for (let i = 0; i < count; i++) moveCrate(from, to);
+  const crates = get().stacks[from].slice(-count);
+  set((state) => {
+    state.stacks[from].splice(-count);
+    state.stacks[to].push(...crates);
+  });
 }
 
 function initialize(file: string) {
