@@ -1,3 +1,3 @@
-import main from './5/index.js'
+import main from './days/6.js'
 
 main()
